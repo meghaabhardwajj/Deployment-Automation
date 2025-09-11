@@ -1,9 +1,10 @@
-Terraform Configuration
+##Terraform Configuration
 
-Variable.tf
+#Variable.tf
 
 
-'''variable "concept_storyline_image_tag" {
+'''
+variable "concept_storyline_image_tag" {
 default = "dev_latest"
 }
 variable "messaging_image_tag" {
@@ -14,7 +15,8 @@ default = "dev_latest"
 }
 variable "user_persona_image_tag" {
 default = "dev_latest"
-}'''
+}
+'''
 
 
 main.tf
