@@ -1,9 +1,9 @@
-##Terraform Configuration
+#Terraform Configuration
 
-#Variable.tf
+##Variable.tf
 
 
-'''
+```
 variable "concept_storyline_image_tag" {
 default = "dev_latest"
 }
@@ -16,11 +16,12 @@ default = "dev_latest"
 variable "user_persona_image_tag" {
 default = "dev_latest"
 }
-'''
+```
 
 
-main.tf
+##main.tf
 
+```
 resource "google_cloud_run_service" "concept_storyline" {
   name     = "dev-concept-storyline-service"
   location = "us-east1"
@@ -33,15 +34,15 @@ resource "google_cloud_run_service" "concept_storyline" {
     }
   }
 }
-
+```
 Note : main.tf will be modified with more later. This is just a sample file for importing.
 
 
 
-Github Yaml File
+##Github Yaml File
 
 
-
+```
 name: Docker Image Builder & Cloud Run Deploy
 
 on:
@@ -102,8 +103,7 @@ jobs:
 
      - name: Terraform Apply
        run: terraform apply -auto-approve -var="image_tag=${{ steps.environment_name.outputs.environment }}_latest"
-
-
+```
 
 
 
