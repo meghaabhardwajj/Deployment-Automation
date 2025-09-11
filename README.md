@@ -1,6 +1,6 @@
 Terraform Configuration
 
-'''Variable.tf'''
+Variable.tf
 
 
 '''variable "concept_storyline_image_tag" {
