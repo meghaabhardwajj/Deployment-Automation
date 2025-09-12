@@ -1,0 +1,50 @@
+name: Deploy Lambda Functions
+
+on:
+  push:
+    branches:
+      - dev
+      - master
+      - main
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy Lambda via Serverless
+    runs-on: default-runner-01
+    environment: blkbox-infrastructure
+    permissions:
+      id-token: write
+      contents: read
+
+    steps:
+      # Checkout repo
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      # Decide stage based on branch
+      - name: Check Branch
+        id: environment_name
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/main" ] || [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT
+          else
+            echo "environment=dev" >> $GITHUB_OUTPUT
+          fi
+
+      # Deploy with Serverless
+      - name: Deploy with Serverless
+        uses: serverless/github-action@v3.2
+        with:
+          args: deploy --stage ${{ steps.environment_name.outputs.environment }}
+        env:
+          SERVERLESS_ACCESS_KEY: ${{ secrets.SERVERLESS_ACCESS_KEY }}
+          # We will be using AWs Creds saved in the Serverless Dashboard 
+
+          # If you prefer raw AWS creds instead of Dashboard auth, replace above with:
+          # AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          # AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          # AWS_REGION: us-west-1
