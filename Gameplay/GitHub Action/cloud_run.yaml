@@ -47,6 +47,12 @@ jobs:
      - name: Build & Push Image
        run: make push env=${{ steps.environment_name.outputs.environment }}
 
+     - name: Get Image URL from Makefile
+       id: image
+       run: |
+         IMAGE_URL=$(make -s -f Makefile env=${{ steps.environment_name.outputs.environment }} --eval "print: ; @echo \$(IMAGE_URL)" print)
+         echo "image_url=$IMAGE_URL" >> $GITHUB_OUTPUT
+
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v3
 
@@ -54,7 +60,7 @@ jobs:
        run: terraform init
 
      - name: Terraform Plan
-       run: terraform plan -var="dev_messaging_image_tag=${{ steps.environment_name.outputs.environment }}_latest"
+       run: terraform plan -var="dev_messaging_image_tag=${{ steps.image.outputs.image_url }}"
 
      - name: Terraform Apply
-       run: terraform apply -auto-approve -var="dev_messaging_image_tag=${{ steps.environment_name.outputs.environment }}_latest"
+       run: terraform apply -auto-approve -var="dev_messaging_image_tag=${{ steps.image.outputs.image_url }}"
