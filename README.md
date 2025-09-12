@@ -1,6 +1,6 @@
-#Plan: Migrating Existing Google Cloud Resources to Terraform & Automating Deployments
+# Plan: Migrating Existing Google Cloud Resources to Terraform & Automating Deployments
 
-##Objective
+## Objective
 
 Bring existing Cloud Run services, jobs, and related resources under Terraform management, and set up an automated CI/CD pipeline with GitHub Actions to handle deployments using Artifact Registry images.
 
