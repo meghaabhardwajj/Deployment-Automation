@@ -7,7 +7,7 @@ on:
       - master
       - main
     paths:
-      - "gameplay/concept-storyline-service/**"
+      - "gameplay/concept_storyline_processing/**"
       - ".github/workflows/concept-storyline-deploy.yaml"
 
 jobs:
@@ -49,14 +49,14 @@ jobs:
 
      - name: Build & Push Image
        run: make push env=${{ steps.environment_name.outputs.environment }}
-       working-directory: ./gameplay/concept-storyline-processing
+       working-directory: ./gameplay/concept_storyline_processing
 
      - name: Get Image URL from Makefile
        id: image
        run: |
          IMAGE_URL=$(make -s -f Makefile env=${{ steps.environment_name.outputs.environment }} --eval "print: ; @echo \$(IMAGE_URL)" print)
          echo "image_url=$IMAGE_URL" >> $GITHUB_OUTPUT
-       working-directory: ./gameplay/concept-storyline-processing
+       working-directory: ./gameplay/concept_storyline_processing
 
      - name: Setup Terraform
        uses: hashicorp/setup-terraform@v3
