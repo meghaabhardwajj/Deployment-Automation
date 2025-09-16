@@ -46,6 +46,7 @@ jobs:
 
      - name: Build & Push Image
        run: make push env=${{ steps.environment_name.outputs.environment }}
+       working-directory: ./gameplay/concept-storyline-processing
 
      - name: Get Image URL from Makefile
        id: image
@@ -58,9 +59,12 @@ jobs:
 
      - name: Terraform Init
        run: terraform init
+       working-directory: ./infra/cloud_run_terraform
 
      - name: Terraform Plan
        run: terraform plan -var="dev_messaging_image_tag=${{ steps.image.outputs.image_url }}"
+       working-directory: ./infra/cloud_run_terraform
 
      - name: Terraform Apply
        run: terraform apply -auto-approve -var="dev_messaging_image_tag=${{ steps.image.outputs.image_url }}"
+       working-directory: ./infra/cloud_run_terraform
