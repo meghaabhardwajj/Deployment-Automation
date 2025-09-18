@@ -66,9 +66,31 @@ jobs:
        working-directory: ./infra/cloud_run_terraform
 
      - name: Terraform Plan
-       run: terraform plan -var="dev_messaging_image_tag=${{ steps.image.outputs.image_url }}"
-       working-directory: ./infra/cloud_run_terraform
+       run: |
+         if [[ "${{ steps.set_env.outputs.environment }}" == "dev" ]]; then
+           terraform plan \
+             -var="dev_concept_storyline_image_tag=${{ steps.image.outputs.image_url }}" \
+             -var="prod_concept_storyline_image_tag=$(terraform output -raw prod_concept_storyline_image_tag || echo '')" \
+             -target=google_cloud_run_service.dev_concept_storyline_service
+         else
+           terraform plan \
+             -var="prod_concept_storyline_image_tag=${{ steps.image.outputs.image_url }}" \
+             -var="dev_concept_storyline_image_tag=$(terraform output -raw dev_concept_storyline_image_tag || echo '')" \
+             -target=google_cloud_run_service.prod_concept_storyline_service
+         fi
+      working-directory: ./infra/cloud_run_terraform
 
      - name: Terraform Apply
-       run: terraform apply -auto-approve -var="dev_messaging_image_tag=${{ steps.image.outputs.image_url }}"
+       run: |
+         if [[ "${{ steps.set_env.outputs.environment }}" == "dev" ]]; then
+           terraform apply -auto-approve \
+             -var="dev_concept_storyline_image_tag=${{ steps.image.outputs.image_url }}" \
+             -var="prod_concept_storyline_image_tag=$(terraform output -raw prod_concept_storyline_image_tag || echo '')" \
+             -target=google_cloud_run_service.dev_concept_storyline_service
+         else
+           terraform apply -auto-approve \
+             -var="prod_concept_storyline_image_tag=${{ steps.image.outputs.image_url }}" \
+             -var="dev_concept_storyline_image_tag=$(terraform output -raw dev_concept_storyline_image_tag || echo '')" \
+             -target=google_cloud_run_service.prod_concept_storyline_service
+         fi
        working-directory: ./infra/cloud_run_terraform
