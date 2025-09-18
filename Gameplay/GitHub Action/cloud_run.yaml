@@ -7,6 +7,8 @@ on:
       - master
       - main
     paths:
+        # Run this workflow only when changes are made in this service’s code or workflow file.
+        # This ensures workflows for other services (where no changes were made) don’t get triggered unnecessarily.
       - "gameplay/concept_storyline_processing/**"
       - ".github/workflows/concept-storyline-deploy.yaml"
 
@@ -50,6 +52,8 @@ jobs:
      - name: Build & Push Image
        run: make push env=${{ steps.environment_name.outputs.environment }}
        working-directory: ./gameplay/concept_storyline_processing
+        #We set the working-directory because the Makefile and code for this service
+       # live inside a subfolder (not in the repo root).
 
      - name: Get Image URL from Makefile
        id: image
@@ -63,7 +67,8 @@ jobs:
 
      - name: Terraform Init
        run: terraform init
-       working-directory: ./infra/cloud_run_terraform
+       working-directory: ./infra/cloud_run_terraform/concept_storyline_processing  
+       
 
      - name: Terraform Plan
        run: |
@@ -78,7 +83,13 @@ jobs:
              -var="dev_concept_storyline_image_tag=$(terraform output -raw dev_concept_storyline_image_tag || echo '')" \
              -target=google_cloud_run_service.prod_concept_storyline_service
          fi
-      working-directory: ./infra/cloud_run_terraform
+       working-directory: ./infra/cloud_run_terraform//concept_storyline_processing
+
+      # We use conditional logic so only the target environment (dev/prod) is updated.
+         # Example: If code is pushed to dev branch, only dev Cloud Run service is updated,
+         # while prod keeps using the last deployed image (fetched via terraform output).
+      ## Note : Terraform requires all variables to be passed (otherwise it errors out if you reference them in your .tf files).
+      # The -target flag ensures Terraform modifies only this service’s Cloud Run resource,
 
      - name: Terraform Apply
        run: |
@@ -93,4 +104,4 @@ jobs:
              -var="dev_concept_storyline_image_tag=$(terraform output -raw dev_concept_storyline_image_tag || echo '')" \
              -target=google_cloud_run_service.prod_concept_storyline_service
          fi
-       working-directory: ./infra/cloud_run_terraform
+       working-directory: ./infra/cloud_run_terraform/concept_storyline_processing
